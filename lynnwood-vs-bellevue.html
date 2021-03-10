@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Lynnwood vs Bellevue Median Household Income </title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
+</head>
+
+<body>
+    <h1>Bellevue vs Lynnwood Comparison</h1>
+    <h3>Median Household Income based on 2010 Census data</h3>
+    <div id="map" style="width: 1000px; height: 900px"></div>
+	<script src = "LynnwoodBellevueMerge_Projec1.js"></script>
+    <script> 
+    //map window
+    var map = L.map('map',{center:[47.6999, -122.2211], zoom:11});
+
+    //basemap
+    var watercolor = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+    }).addTo(map)
+
+    //shapefile
+    var shp = L.geoJSON(data, {
+        style: style,
+        onEachFeature:function popUp(f,l){
+        var out = [];
+        if (f.properties){
+            for(var key in f.properties){
+            out.push(key+": "+f.properties[key]);
+        }
+        l.bindPopup(out.join("<br />"));
+    }}},
+    )
+
+    //color
+    function getColor(d) {
+    return d > 201818 ? '#006837' :
+           d > 133583  ? '#31a354' :
+           d > 99643  ? '#78c679' :
+           d > 78186  ? '#addd8e' :
+           d > 55171   ? '#d9f0a3' :
+                        '#ffffe6';
+    }
+
+    //obtain geojson values and set fill properties
+    function style(features) {
+        return {
+            fillColor: getColor(features.properties.MHHI1),
+            weight: 0.5,
+            opacity: 1,
+            color: 'black',
+            dashArray: '1',
+            fillOpacity: 0.75
+        };
+    }
+    
+    var baseMaps = {
+        "Base Layer": watercolor
+    };
+
+    var overlays = {
+        "Median Household Income": shp
+    };
+
+    L.control.layers(baseMaps,overlays).addTo(map);
+    
+    
+        
+</script>
+</body>
+
+</html>
